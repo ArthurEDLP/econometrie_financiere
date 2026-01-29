@@ -154,7 +154,7 @@ plot(return_var_GARCH_N, main = "Variance conditionnelle du modèle GARCH", col 
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_GARCH_N,legend.loc = "top", main = "Variance conditionnelle du modèle GARCH", col = "blue")
+plot.xts(return_var_GARCH_N, main = "Variance conditionnelle du modèle GARCH", col = "blue")
 
 ##########################  IGARCH  ############################
 
@@ -193,62 +193,9 @@ return_var_GJR_N <- xts(mod_GJR_N@fit$var, order.by = as.Date(index(rGSPC)))
 par(mfrow=c(2,1))
 plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
 plot.xts(return_var_GJR_N,legend.loc = "top", main = "Variance conditionnelle du modèle GJR(1,1)", col = "blue")
-=======
+
 plot.xts(creturn,legend.loc = "top", main = "Rentabilités du LMT", col = rainbow(4))
 plot.xts(creturn2,legend.loc = "top", main = "Rentabilités au carré du LMT", col = "blue")
-
-
-###### 4) Faire les graphiques des corrélagrammes (FAC et FAP) des rentabilités et des rentabilités au carré (série corrigée). Commenter
-
-# Corrélogrammes des rentabilités
-par(mfrow=c(2,2))
-acf(creturn, main="Return ACF")
-pacf(creturn, main="Return PACF")
-acf(creturn2, main="Squared return ACF")
-pacf(creturn2, main="Squared return PACF")
-
-##### 5) Statistiques descriptives sur la série corrigée. Résultats sous forme de tableau.Commenter
-
-# Stat descriptives (série corrigée LMT)
-#********************************************************************************************
-
-library(PerformanceAnalytics)
-
-# creturn = clean returns (ici : crLMT)
-creturn <- crLMT
-
-# PerformanceAnalytics (attention: table.Stats donne Ex.Kurtosis)
-table.Stats(creturn * 100)
-table.Distributions(creturn)
-table.Autocorrelation(creturn)
-
-# fBasics : moyenne, sd, skewness, kurtosis, etc.
-library(fBasics)
-stat1 <- basicStats(coredata(creturn))      # rendements en décimal
-show(stat1)
-
-stat <- basicStats(coredata(creturn) * 100) # rendements en %
-show(stat)
-
-# Jarque-Bera (DescTools)
-library(DescTools)
-JarqueBeraTest(coredata(creturn), robust = FALSE, method = "chisq")
-
-# Tests d'autocorrélation Box-Pierce et Ljung-Box (10 retards)
-Box.test(coredata(creturn), lag = 10, type = "Box-Pierce", fitdf = 0)
-Box.test(coredata(creturn), lag = 10, type = "Ljung-Box", fitdf = 0)
-
-# Test ARCH (FinTS) sur 5 et 10 retards
-library(FinTS)
-ArchTest(coredata(creturn), lags = 5)
-ArchTest(coredata(creturn), lags = 10)
-
-
-
-
->>>>>>> df7dcd80e896ac7ee83703adcd1a84ccec9a0acb
-
-
 
 
 # Loi Student ----
