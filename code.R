@@ -4,6 +4,8 @@
 
 library(quantmod)
 library(PerformanceAnalytics)
+library(rugarch)
+library(tseries)
  
  
 
@@ -54,7 +56,6 @@ boxplot(rLMT,  main = "Raw returns",   col = "lightgray")
 boxplot(crLMT, main = "Clean returns", col = "lightgray")
 
 # JARQUE BERA POUR LE REJET DE LA NORMALITÉ SI BCP DE VALEUR ATYPIQUE 
-library(tseries)
 
 jarque.bera.test(coredata(rLMT)) # X-squared = 8855.7, df = 2, p-value < 2.2e-16
 jarque.bera.test(coredata(crLMT)) # X-squared = 403.41, df = 2, p-value < 2.2e-16
@@ -82,27 +83,135 @@ options(repr.plot.res = 300, repr.plot.height = 4.4)
 plot.xts(data,legend.loc = "top", main = "Clean and raw LMT returns", col = rainbow(4))
 
 # Calcul des rentabilités au carré du LMT
-creturn2 <- creturn^2
+cr2LMT <- crLMT^2
 
 # Graphique des rentabilités et des rentabilités au carré du LMT
 par(mfrow=c(2,1))
-plot.xts(creturn,legend.loc = "top", main = "Rentabilités du LMT", col = rainbow(4))
-plot.xts(creturn2,legend.loc = "top", main = "Rentabilités au carré du LMT", col = "blue")
+plot.xts(crLMT,legend.loc = "top", main = "Rentabilités du LMT", col = rainbow(4))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LMT", col = "blue")
+
+
+################ 7) Modèle et volatilité ##################
+
+# Loi normal ----
+
+y = crLMT
+
+###########################  GARCH  ############################
+
+
+spec_GARCH_N = ugarchspec(variance.model=list(model = "sGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE))
+mod_GARCH_N = ugarchfit(data = y, spec = spec_GARCH_N)
+mod_GARCH_N
+
+# Conditionnal variance
+return_var_GARCH_N <- xts(mod_GARCH_N@fit$var, order.by = as.Date(index(rLMT)))
+plot(return_var_GARCH_N, main = "Variance conditionnelle du modèle GARCH", col = "blue")
+
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_GARCH_N,legend.loc = "top", main = "Variance conditionnelle du modèle GARCH", col = "blue")
+
+##########################  IGARCH  ############################
+
+spec_IGARCH_N = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE))
+mod_IGARCH_N = ugarchfit(data = y, spec = spec_IGARCH_N)
+mod_IGARCH_N
+
+return_var_IGARCH_N <- xts(mod_IGARCH_N@fit$var, order.by = as.Date(index(rGSPC)))
+
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_IGARCH_N,legend.loc = "top", main = "Variance conditionnelle du modèle IGARCH", col = "blue")
+
+##########################  Riskmetrics  ##############################
+
+
+spec_RISK_N = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE), fixed.pars=list(omega=0,alpha1=0.06,beta1=0.94))
+mod_RISK_N = ugarchfit(data = y, spec = spec_RISK_N)
+mod_RISK_N
+
+return_var_RISK_N <- xts(mod_RISK_N@fit$var, order.by = as.Date(index(rGSPC)))
+
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_RISK_N,legend.loc = "top", main = "Variance conditionnelle du modèle Riskmetrics", col = "blue")
+
+##########################  GJR-GARCH  ############################
+
+
+spec_GJR_N = ugarchspec(variance.model=list(model = "gjrGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE))
+mod_GJR_N = ugarchfit(data = y, spec = spec_GJR_N)
+mod_GJR_N
+
+return_var_GJR_N <- xts(mod_GJR_N@fit$var, order.by = as.Date(index(rGSPC)))
+
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_GJR_N,legend.loc = "top", main = "Variance conditionnelle du modèle GJR(1,1)", col = "blue")
 
 
 
 
+# Loi Student ----
 
 
+###########################  GARCH  ############################
 
 
+spec_GARCH_S = ugarchspec(variance.model=list(model = "sGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
+                          distribution.model = "std")
+mod_GARCH_S = ugarchfit(data = y, spec = spec_GARCH_S)
+mod_GARCH_S
+
+return_var_GARCH_S <- xts(mod_GARCH_S@fit$var, order.by = as.Date(index(rLMT)))
+plot(return_var_GARCH_S, main = "Variance conditionnelle du modèle GARCH", col = "blue")
+
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_GARCH_S,legend.loc = "top", main = "Variance conditionnelle du modèle GARCH", col = "blue")
+
+##########################  IGARCH  ############################
+
+spec_IGARCH_S = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
+                           distribution.model = "std")
+mod_IGARCH_S = ugarchfit(data = y, spec = spec_IGARCH_S)
+mod_IGARCH_S
+
+return_var_IGARCH_S <- xts(mod_IGARCH_S@fit$var, order.by = as.Date(index(rGSPC)))
+
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_IGARCH_S,legend.loc = "top", main = "Variance conditionnelle du modèle IGARCH", col = "blue")
+
+##########################  Riskmetrics  ##############################
 
 
+spec_RISK_S = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
+                         distribution.model = "std",
+                         fixed.pars=list(omega=0,alpha1=0.06,beta1=0.94))
+mod_RISK_S = ugarchfit(data = y, spec = spec_RISK_S)
+mod_RISK_S
+
+return_var_RISK_S <- xts(mod_RISK_S@fit$var, order.by = as.Date(index(rGSPC)))
+
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_RISK_S,legend.loc = "top", main = "Variance conditionnelle du modèle Riskmetrics", col = "blue")
+
+##########################  GJR-GARCH  ############################
 
 
+spec_GJR_S = ugarchspec(variance.model=list(model = "gjrGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
+                        distribution.model = "std")
+mod_GJR_S = ugarchfit(data = y, spec = spec_GJR_S)
+mod_GJR_S
 
+return_var_GJR_S <- xts(mod_GJR_S@fit$var, order.by = as.Date(index(rGSPC)))
 
-
+par(mfrow=c(2,1))
+plot.xts(cr2LMT,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
+plot.xts(return_var_GJR_S,legend.loc = "top", main = "Variance conditionnelle du modèle GJR(1,1)", col = "blue")
 
 
 
