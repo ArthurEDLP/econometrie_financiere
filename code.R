@@ -1,11 +1,25 @@
+ # Packages ----
 
+ 
 
-data <- read.table("LOCKHEEDMARTIN.txt", header = TRUE, sep = "", stringsAsFactors = FALSE)
+library(quantmod)
 
-summary(data)
+ 
 
-str(data)
+# Données ----
 
-data[c("ouv", "haut", "bas", "vol", "devise")] <- NULL
+ 
 
-data$renta <- c(NA, diff(data$clot) / head(data$clot, -1))
+getSymbols("LMT", src = "yahoo",
+           from = as.Date("2021-01-01"),
+           to   = as.Date("2025-12-31"))
+
+class(LMT)
+head(LMT)
+dim(LMT)
+price <- LMT[,6] # On prend 6 et pas 4 car il faut enlever les dividendes
+ 
+  
+
+ 
+
