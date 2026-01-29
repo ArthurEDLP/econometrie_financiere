@@ -61,18 +61,13 @@ jarque.bera.test(coredata(crLMT)) # X-squared = 403.41, df = 2, p-value < 2.2e-1
 
 #DETECTER LE TOP 3 
 
-# 3) Faire les graphiques
+################ 3) Graphiques ##################
 
  
 ## Visualisation des données ----
 
 options(repr.plot.res = 300, repr.plot.height = 4.4) 
 plot.xts(LMT[,1:4],legend.loc = "left", main = "Prix de l'action LOCKHEED", col = rainbow(4))
-
-
-## Calcul des rentabilités ----
-rLMT <- dailyReturn(price)
-crLMT <- Return.clean(rLMT, method = "boudt") # base de données corrigée
 
 
 # Graphique du cours du cloture et des rentabilités 
