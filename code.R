@@ -17,6 +17,50 @@ getSymbols("LMT", src = "yahoo",
 head(LMT)
 price <- LMT[,6] # On prend 6 et pas 4 car il faut enlever les dividendes
 
+
+################ 2) Outiliers et valeurs impotante ##################
+
+
+# VISUALISATION ET HISTOGRAMME 
+rLMT <- dailyReturn(price$LMT.Adjusted)
+
+crLMT <- Return.clean(rLMT, method = "boudt")
+
+write(t(crLMT), file = "clean-returns_LMT.out", ncolumn = 1, append = FALSE)
+
+data_ret <- cbind(crLMT, rLMT)
+options(repr.plot.res = 300, repr.plot.height = 4.4)
+plot.xts(data_ret, legend.loc = "top",
+         main = "Clean and raw LMT returns", col = rainbow(4))
+
+par(mfrow = c(1, 2))
+chart.Histogram(rLMT, xlab = "Returns", ylab = "Frequency",
+                methods = c("add.density", "add.normal"))
+chart.Histogram(crLMT, xlab = "Clean returns", ylab = "Frequency",
+                methods = c("add.density", "add.normal"))
+
+# SKEW et KURT 
+table_stats <- rbind(
+  Raw   = c(skewness(rLMT), kurtosis(rLMT)), # -0.9301459 12.859495
+  Clean = c(skewness(crLMT), kurtosis(crLMT)) # -0.2930737  2.706844
+)
+
+colnames(table_stats) <- c("Skewness", "Kurtosis")
+table_stats
+
+# BOXPLOT ET VISUALISATION 
+par(mfrow = c(1, 2))
+boxplot(rLMT,  main = "Raw returns",   col = "lightgray")
+boxplot(crLMT, main = "Clean returns", col = "lightgray")
+
+# JARQUE BERA POUR LE REJET DE LA NORMALITÉ SI BCP DE VALEUR ATYPIQUE 
+library(tseries)
+
+jarque.bera.test(coredata(rLMT)) # X-squared = 8855.7, df = 2, p-value < 2.2e-16
+jarque.bera.test(coredata(crLMT)) # X-squared = 403.41, df = 2, p-value < 2.2e-16
+
+#DETECTER LE TOP 3 
+
 # 3) Faire les graphiques
 
  
