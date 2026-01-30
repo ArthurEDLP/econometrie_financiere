@@ -119,6 +119,7 @@ acf(creturn2, main="Squared return ACF")
 pacf(creturn2, main="Squared return PACF")
 
 ##### 5) Statistiques descriptives sur la série corrigée. Résultats sous forme de tableau.Commenter
+##### 6) Caractéristiques de distribution sur la série corrigée. Résultats sous forme de tableau. Commenter
 
 # Stat descriptives (série corrigée LMT)
 #********************************************************************************************
