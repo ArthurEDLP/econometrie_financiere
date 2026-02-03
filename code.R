@@ -102,6 +102,8 @@ data <- cbind(crLMT,rLMT)
 options(repr.plot.res = 300, repr.plot.height = 4.4) 
 plot.xts(data,legend.loc = "top", main = "Clean and raw LMT returns", col = rainbow(4))
 
+
+
 creturn <- crLMT
 # Calcul des rentabilités au carré du LMT
 cr2LMT <- crLMT^2
@@ -379,3 +381,4 @@ data <- cbind(original,varmat)
 options(repr.plot.res = 300, repr.plot.height = 4.4) 
 plot.xts(data,legend.loc = "topleft", main = "Returns and VaR", col = rainbow(4))
 
+ 
