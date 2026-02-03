@@ -146,15 +146,15 @@ ArchTest(coredata(crLMT), lags = 10)
 crLMT_2024 <- crLMT["/2024-12-31"]
 
 
-y <- crLMT_2024
-
+y_2024 <- crLMT_2024 
+  
 cr2LMT_2024 <- cr2LMT["/2024-12-31"]
 
 ###########################  GARCH  ############################
 
 
 spec_GARCH_N = ugarchspec(variance.model=list(model = "sGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE))
-mod_GARCH_N = ugarchfit(data = y, spec = spec_GARCH_N)
+mod_GARCH_N = ugarchfit(data = y_2024, spec = spec_GARCH_N)
 mod_GARCH_N
 
 # Conditionnal variance
@@ -168,7 +168,7 @@ plot.xts(return_var_GARCH_N, main = "Variance conditionnelle du modèle GARCH", 
 ##########################  IGARCH  ############################
 
 spec_IGARCH_N = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE))
-mod_IGARCH_N = ugarchfit(data = y, spec = spec_IGARCH_N)
+mod_IGARCH_N = ugarchfit(data = y_2024, spec = spec_IGARCH_N)
 mod_IGARCH_N
 
 return_var_IGARCH_N <- xts(mod_IGARCH_N@fit$var, order.by = as.Date(index(crLMT_2024)))
@@ -181,7 +181,7 @@ plot.xts(return_var_IGARCH_N, main = "Variance conditionnelle du modèle IGARCH"
 
 
 spec_RISK_N = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE), fixed.pars=list(omega=0,alpha1=0.06,beta1=0.94))
-mod_RISK_N = ugarchfit(data = y, spec = spec_RISK_N)
+mod_RISK_N = ugarchfit(data = y_2024, spec = spec_RISK_N)
 mod_RISK_N
 
 return_var_RISK_N <- xts(mod_RISK_N@fit$var, order.by = as.Date(index(crLMT_2024)))
@@ -194,7 +194,7 @@ plot.xts(return_var_RISK_N, main = "Variance conditionnelle du modèle Riskmetri
 
 
 spec_GJR_N = ugarchspec(variance.model=list(model = "gjrGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE))
-mod_GJR_N = ugarchfit(data = y, spec = spec_GJR_N)
+mod_GJR_N = ugarchfit(data = y_2024, spec = spec_GJR_N)
 mod_GJR_N
 
 return_var_GJR_N <- xts(mod_GJR_N@fit$var, order.by = as.Date(index(crLMT_2024)))
@@ -212,7 +212,7 @@ plot.xts(return_var_GJR_N, main = "Variance conditionnelle du modèle GJR(1,1)",
 
 spec_GARCH_S = ugarchspec(variance.model=list(model = "sGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
                           distribution.model = "std")
-mod_GARCH_S = ugarchfit(data = y, spec = spec_GARCH_S)
+mod_GARCH_S = ugarchfit(data = y_2024, spec = spec_GARCH_S)
 mod_GARCH_S
 
 return_var_GARCH_S <- xts(mod_GARCH_S@fit$var, order.by = as.Date(index(crLMT_2024)))
@@ -226,7 +226,7 @@ plot.xts(return_var_GARCH_S, main = "Variance conditionnelle du modèle GARCH", 
 
 spec_IGARCH_S = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
                            distribution.model = "std")
-mod_IGARCH_S = ugarchfit(data = y, spec = spec_IGARCH_S)
+mod_IGARCH_S = ugarchfit(data = y_2024, spec = spec_IGARCH_S)
 mod_IGARCH_S
 
 return_var_IGARCH_S <- xts(mod_IGARCH_S@fit$var, order.by = as.Date(index(crLMT_2024)))
@@ -241,7 +241,7 @@ plot.xts(return_var_IGARCH_S, main = "Variance conditionnelle du modèle IGARCH"
 spec_RISK_S = ugarchspec(variance.model=list(model = "iGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
                          distribution.model = "std",
                          fixed.pars=list(omega=0,alpha1=0.06,beta1=0.94))
-mod_RISK_S = ugarchfit(data = y, spec = spec_RISK_S)
+mod_RISK_S = ugarchfit(data = y_2024, spec = spec_RISK_S)
 mod_RISK_S
 
 return_var_RISK_S <- xts(mod_RISK_S@fit$var, order.by = as.Date(index(crLMT_2024)))
@@ -255,7 +255,7 @@ plot.xts(return_var_RISK_S, main = "Variance conditionnelle du modèle Riskmetri
 
 spec_GJR_S = ugarchspec(variance.model=list(model = "gjrGARCH"), mean.model=list(armaOrder=c(0,0), include.mean=TRUE),
                         distribution.model = "std")
-mod_GJR_S = ugarchfit(data = y, spec = spec_GJR_S)
+mod_GJR_S = ugarchfit(data = y_2024, spec = spec_GJR_S)
 mod_GJR_S
 
 return_var_GJR_S <- xts(mod_GJR_S@fit$var, order.by = as.Date(index(crLMT_2024)))
@@ -339,12 +339,13 @@ show(hl_GJR_S)
 ######################### VAR##################################
 ## VAR ----
 
-# LES DONN2ES NE SONT PAS BONNES POUR NOTRE CONTEXTE
 
 b <- nrow(crLMT)	# b=1254
-estim <- 1006		# nbre observations des rentabilités de 2021 à 2024
-h <- b-1007+1		# nbre observations des rentabilités en 2025
-original <- return[1007:1258, 1]		# rentabilités originales en 2024
+estim <- nrow(crLMT_2024)		# nbre observations des rentabilités de 2021 à 2024 = 1005
+h <- b-estim+1		# nbre observations des rentabilités en 2025
+original <- crLMT[estim:b, 1]		# rentabilités originales en 2024
+
+y <- crLMT
 
 #----------------------------------------------------------
 # Matrix initialization
@@ -353,11 +354,22 @@ varmat <- matrix(nrow=h, ncol=1)			# matrice contenant les prévisions de la VaR
 esmat <- matrix(nrow=h, ncol=1)
 
 #----------------------------------------------------------
-
+# GARCH
 for(i in 1:h)
 {
-  yy <- y[i:(estim-1+i),1]
+  yy <- crLMT[i:(estim-1+i),1]
   fit = ugarchfit(data = yy, spec = spec_GARCH_N)
+  forc =  ugarchforecast(fit, n.ahead=1)
+  foremat[i,1] <- sigma(forc)^2
+  varmat[i,1] <- qnorm(0.05)*sigma(forc)
+  esmat[i,1] <- -dnorm(qnorm(0.05))/0.05*sigma(forc)
+}
+
+# IGARCH
+for(i in 1:h)
+{
+  yy <- crLMT[i:(estim-1+i),1]
+  fit = ugarchfit(data = yy, spec = spec_IGARCH_S)
   forc =  ugarchforecast(fit, n.ahead=1)
   foremat[i,1] <- sigma(forc)^2
   varmat[i,1] <- qnorm(0.05)*sigma(forc)
