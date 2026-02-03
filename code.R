@@ -342,3 +342,40 @@ show(hl_GJR_S)
 
 ######################### VAR##################################
 ## VAR ----
+
+# LES DONN2ES NE SONT PAS BONNES POUR NOTRE CONTEXTE
+
+b <- nrow(crLMT)	# b=1254
+estim <- 1006		# nbre observations des rentabilités de 2021 à 2024
+h <- b-1007+1		# nbre observations des rentabilités en 2025
+original <- return[1007:1258, 1]		# rentabilités originales en 2024
+
+#----------------------------------------------------------
+# Matrix initialization
+foremat <- matrix(nrow=h, ncol=1)			# matrice contenant les prévisions de la variance
+varmat <- matrix(nrow=h, ncol=1)			# matrice contenant les prévisions de la VaR
+esmat <- matrix(nrow=h, ncol=1)
+
+#----------------------------------------------------------
+
+for(i in 1:h)
+{
+  yy <- y[i:(estim-1+i),1]
+  fit = ugarchfit(data = yy, spec = spec_GARCH_N)
+  forc =  ugarchforecast(fit, n.ahead=1)
+  foremat[i,1] <- sigma(forc)^2
+  varmat[i,1] <- qnorm(0.05)*sigma(forc)
+  esmat[i,1] <- -dnorm(qnorm(0.05))/0.05*sigma(forc)
+}
+
+error <- original^2 - foremat
+mse <- mean(error^2)
+mse*100			# MSE(%)
+mean(varmat)	# VaR moyenne
+mean(esmat)		# Expected shortfall
+
+# VaR figure
+data <- cbind(original,varmat)
+options(repr.plot.res = 300, repr.plot.height = 4.4) 
+plot.xts(data,legend.loc = "topleft", main = "Returns and VaR", col = rainbow(4))
+
