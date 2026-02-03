@@ -122,6 +122,10 @@ acf(coredata(cr2LMT), main="Squared return ACF")
 pacf(coredata(cr2LMT), main="Squared return PACF")
 
 ##### 5) Statistiques descriptives sur la série corrigée
+##### 6) Caractéristiques de distribution sur la série corrigée. Résultats sous forme de tableau. Commenter
+
+library(PerformanceAnalytics)
+
 table.Stats(crLMT * 100)
 table.Distributions(crLMT)
 table.Autocorrelation(crLMT)
