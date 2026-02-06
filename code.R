@@ -337,10 +337,27 @@ show(hl_RISK_S)
 hl_GJR_S = halflife(mod_GJR_S) 
 show(hl_GJR_S)
 
+##################### Différents tests #########################
+
+library(DescTools)
+# Normalité
+
+JarqueBeraTest(crLMT, robust = FALSE, method = "chisq")
+
+# Autocorrélation
+Box.test(crLMT, lag = 10, type = c("Box-Pierce", "Ljung-Box"), fitdf = 0)
+Box.test(crLMT, lag = 10, type = "Ljung-Box", fitdf = 0)
 
 
+# # homoscédasticité conditionnelle
+# library(FinTS)
+# library(e1071)
+# 
+# ArchTest(base2,lag=5)
+# ArchTest(base2,lag=10)
 
-######################### VAR##################################
+
+######################### VAR ##################################
 ## VAR ----
 
 
@@ -387,6 +404,7 @@ mean(varmat)	# VaR moyenne
 mean(esmat)		# Expected shortfall
 
 # VaR figure
+par(mfrow=c(1,1))
 data <- cbind(original,varmat)
 options(repr.plot.res = 300, repr.plot.height = 4.4) 
 plot.xts(data,legend.loc = "topleft", main = "Returns and VaR", col = rainbow(4))
