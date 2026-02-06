@@ -392,5 +392,6 @@ mean(esmat)		# Expected shortfall
 data <- cbind(original,varmat)
 options(repr.plot.res = 300, repr.plot.height = 4.4) 
 plot.xts(data,legend.loc = "topleft", main = "Returns and VaR", col = rainbow(4))
+ 
 
  
