@@ -169,7 +169,7 @@ plot(return_var_GARCH_N, main = "Variance conditionnelle du modèle GARCH", col 
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_GARCH_N, main = "Variance conditionnelle du modèle GARCH", col = "blue")
+plot.xts(return_var_GARCH_N, main = "Variance conditionnelle du modèle GARCH (normal)", col = "blue")
 
 ##########################  IGARCH  ############################
 
@@ -181,7 +181,7 @@ return_var_IGARCH_N <- xts(mod_IGARCH_N@fit$var, order.by = as.Date(index(crLMT_
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_IGARCH_N, main = "Variance conditionnelle du modèle IGARCH", col = "blue")
+plot.xts(return_var_IGARCH_N, main = "Variance conditionnelle du modèle IGARCH (normal)", col = "blue")
 
 ##########################  Riskmetrics  ##############################
 
@@ -194,7 +194,7 @@ return_var_RISK_N <- xts(mod_RISK_N@fit$var, order.by = as.Date(index(crLMT_2024
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_RISK_N, main = "Variance conditionnelle du modèle Riskmetrics", col = "blue")
+plot.xts(return_var_RISK_N, main = "Variance conditionnelle du modèle Riskmetrics (normal)", col = "blue")
 
 ##########################  GJR-GARCH  ############################
 
@@ -207,7 +207,7 @@ return_var_GJR_N <- xts(mod_GJR_N@fit$var, order.by = as.Date(index(crLMT_2024))
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_GJR_N, main = "Variance conditionnelle du modèle GJR(1,1)", col = "blue")
+plot.xts(return_var_GJR_N, main = "Variance conditionnelle du modèle GJR(1,1) (normal)", col = "blue")
 
 
 # Loi Student ----
@@ -222,11 +222,10 @@ mod_GARCH_S = ugarchfit(data = y_2024, spec = spec_GARCH_S)
 mod_GARCH_S
 
 return_var_GARCH_S <- xts(mod_GARCH_S@fit$var, order.by = as.Date(index(crLMT_2024)))
-plot(return_var_GARCH_S, main = "Variance conditionnelle du modèle GARCH", col = "blue")
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_GARCH_S, main = "Variance conditionnelle du modèle GARCH", col = "blue")
+plot.xts(return_var_GARCH_S, main = "Variance conditionnelle du modèle GARCH (student)", col = "blue")
 
 ##########################  IGARCH  ############################
 
@@ -239,7 +238,7 @@ return_var_IGARCH_S <- xts(mod_IGARCH_S@fit$var, order.by = as.Date(index(crLMT_
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_IGARCH_S, main = "Variance conditionnelle du modèle IGARCH", col = "blue")
+plot.xts(return_var_IGARCH_S, main = "Variance conditionnelle du modèle IGARCH (student)", col = "blue")
 
 ##########################  Riskmetrics  ##############################
 
@@ -254,7 +253,7 @@ return_var_RISK_S <- xts(mod_RISK_S@fit$var, order.by = as.Date(index(crLMT_2024
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_RISK_S, main = "Variance conditionnelle du modèle Riskmetrics", col = "blue")
+plot.xts(return_var_RISK_S, main = "Variance conditionnelle du modèle Riskmetrics (student)", col = "blue")
 
 ##########################  GJR-GARCH  ############################
 
@@ -268,7 +267,7 @@ return_var_GJR_S <- xts(mod_GJR_S@fit$var, order.by = as.Date(index(crLMT_2024))
 
 par(mfrow=c(2,1))
 plot.xts(cr2LMT_2024,legend.loc = "top", main = "Rentabilités au carré du LOCKHEED", col = rainbow(4))
-plot.xts(return_var_GJR_S, main = "Variance conditionnelle du modèle GJR(1,1)", col = "blue")
+plot.xts(return_var_GJR_S, main = "Variance conditionnelle du modèle GJR(1,1) (student)", col = "blue")
 
 ##########################  Persistence  ############################
 
@@ -341,22 +340,22 @@ show(hl_GJR_S)
 
 ##################### Différents tests #########################
 
-library(DescTools)
-# Normalité
+# résidus standardisés
 
-JarqueBeraTest(crLMT, robust = FALSE, method = "chisq")
+z_IGARCH_S <- residuals(mod_IGARCH_S, standardize = TRUE)
+z_GARCH_N <- residuals(mod_GARCH_N, standardize = TRUE)
 
-# Autocorrélation
-Box.test(crLMT, lag = 10, type = c("Box-Pierce", "Ljung-Box"), fitdf = 0)
-Box.test(crLMT, lag = 10, type = "Ljung-Box", fitdf = 0)
+# autocorr des résidus
 
+Box.test(as.numeric(z_GARCH_N), lag = 20, type = "Ljung-Box")
+Box.test(as.numeric(z_GARCH_N)^2, lag = 20, type = "Ljung-Box")
 
-# # homoscédasticité conditionnelle
-# library(FinTS)
-# library(e1071)
-# 
-# ArchTest(base2,lag=5)
-# ArchTest(base2,lag=10)
+###############
+## IGARCH_S
+###############
+
+Box.test(as.numeric(z_IGARCH_S), lag = 20, type = "Ljung-Box")
+Box.test(as.numeric(z_IGARCH_S)^2, lag = 20, type = "Ljung-Box")
 
 
 ######################### VAR ##################################
